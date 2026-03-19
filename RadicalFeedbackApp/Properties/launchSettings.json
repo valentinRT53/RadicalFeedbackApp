@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RadicalFeedbackApp (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "RadicalFeedbackApp (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

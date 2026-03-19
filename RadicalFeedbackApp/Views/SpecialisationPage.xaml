@@ -1,0 +1,178 @@
+<Page
+    x:Class="RadicalFeedbackApp.Views.SpecialisationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:RadicalFeedbackApp.ViewModels">
+    <Page.DataContext>
+        <vm:SpecialisationViewModel/>
+    </Page.DataContext>
+
+    <Grid Background="#0A0A0B">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition x:Name="PanelColumn" Width="0"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" BorderBrush="#2A2A32" BorderThickness="0,0,0,1" Padding="32,28,32,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="SPÉCIALISATIONS"
+                                   FontFamily="Bebas Neue"
+                                   FontSize="28"
+                                   CharacterSpacing="20"
+                                   Foreground="White"/>
+                        <TextBlock Text="Gestion des domaines d'expertise"
+                                   FontSize="12"
+                                   Foreground="#6B6B7A"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Button x:Name="BtnAjouter"
+                            Grid.Column="1"
+                            Content="+ AJOUTER"
+                            Background="#E8192C"
+                            Foreground="White"
+                            FontFamily="Bebas Neue"
+                            FontSize="14"
+                            Padding="20,10"
+                            CornerRadius="2"
+                            VerticalAlignment="Center"
+                            Click="BtnAjouter_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Cartes -->
+            <ScrollViewer Grid.Row="1" Padding="32,24">
+                <ItemsControl ItemsSource="{Binding Specialisations}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="260"
+                                    Margin="0,0,16,16"
+                                    Background="#111114"
+                                    BorderBrush="#2A2A32"
+                                    BorderThickness="1"
+                                    CornerRadius="2">
+                                <Grid>
+                                    <Border Height="2" Background="#E8192C"
+                                            VerticalAlignment="Top" CornerRadius="2,2,0,0"/>
+                                    <StackPanel Padding="20,24,20,20" Spacing="0">
+
+                                        <TextBlock Text="{Binding Nom}"
+                                                   FontFamily="Bebas Neue"
+                                                   FontSize="20"
+                                                   CharacterSpacing="10"
+                                                   Foreground="White"
+                                                   Margin="0,0,0,8"/>
+
+                                        <TextBlock Text="{Binding Description}"
+                                                   FontSize="12"
+                                                   Foreground="#6B6B7A"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,0,0,16"/>
+
+                                        <Border Height="1" Background="#2A2A32" Margin="0,0,0,16"/>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Button Content="MODIFIER"
+                                                    Tag="{Binding}"
+                                                    Background="#18181D"
+                                                    Foreground="#A0A0B0"
+                                                    FontFamily="Bebas Neue"
+                                                    FontSize="12"
+                                                    Padding="12,6"
+                                                    CornerRadius="2"
+                                                    Click="BtnModifier_Click"/>
+                                            <Button Content="✕"
+                                                    Tag="{Binding}"
+                                                    Background="#1E0508"
+                                                    Foreground="#E8192C"
+                                                    FontSize="12"
+                                                    Padding="12,6"
+                                                    CornerRadius="2"
+                                                    Click="BtnSupprimer_Click"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Side Panel -->
+        <Border x:Name="SidePanel"
+                Grid.Column="1"
+                Background="#111114"
+                BorderBrush="#2A2A32"
+                BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" BorderBrush="#2A2A32" BorderThickness="0,0,0,1" Padding="24,20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="PanelTitre"
+                                   FontFamily="Bebas Neue"
+                                   FontSize="20"
+                                   CharacterSpacing="20"
+                                   Foreground="White"/>
+                        <Button Grid.Column="1" Content="✕"
+                                Background="Transparent" BorderThickness="0"
+                                Foreground="#6B6B7A" FontSize="14"
+                                Click="BtnFermer_Click"/>
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Row="1" Padding="24,20">
+                    <StackPanel Spacing="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="NOM" FontSize="9" CharacterSpacing="200" Foreground="#6B6B7A"/>
+                            <TextBox x:Name="ChampNom" Background="#18181D" BorderBrush="#2A2A32"
+                                     Foreground="White" Padding="12,10" CornerRadius="2"/>
+                        </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="DESCRIPTION" FontSize="9" CharacterSpacing="200" Foreground="#6B6B7A"/>
+                            <TextBox x:Name="ChampDescription" Background="#18181D" BorderBrush="#2A2A32"
+                                     Foreground="White" Padding="12,10" CornerRadius="2"
+                                     AcceptsReturn="True" Height="100" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <TextBlock x:Name="PanelErreur" Foreground="#E8192C"
+                                   FontSize="12" Visibility="Collapsed"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Border Grid.Row="2" BorderBrush="#2A2A32" BorderThickness="0,1,0,0" Padding="24,16">
+                    <Button x:Name="BtnValider"
+                            HorizontalAlignment="Stretch"
+                            Background="#E8192C" Foreground="White"
+                            FontFamily="Bebas Neue" FontSize="16"
+                            Padding="0,12" CornerRadius="2"
+                            Click="BtnValider_Click"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

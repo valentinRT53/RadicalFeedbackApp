@@ -1,0 +1,163 @@
+<Page
+    x:Class="RadicalFeedbackApp.Views.AvisPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:RadicalFeedbackApp.ViewModels">
+    <Page.DataContext>
+        <vm:AvisViewModel/>
+    </Page.DataContext>
+
+    <Grid Background="#0A0A0B">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" BorderBrush="#2A2A32" BorderThickness="0,0,0,1" Padding="32,28,32,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="AVIS"
+                               FontFamily="Bebas Neue"
+                               FontSize="28"
+                               CharacterSpacing="20"
+                               Foreground="White"/>
+                    <TextBlock Text="Évaluations reçues"
+                               FontSize="12"
+                               Foreground="#6B6B7A"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <!-- Menu déroulant admin -->
+                <ComboBox x:Name="ExpertCombo"
+                          Grid.Column="1"
+                          Width="220"
+                          VerticalAlignment="Center"
+                          Background="#111114"
+                          Foreground="White"
+                          BorderBrush="#2A2A32"
+                          Visibility="Collapsed"
+                          SelectionChanged="ExpertCombo_SelectionChanged"/>
+            </Grid>
+        </Border>
+
+        <!-- Bloc note moyenne -->
+        <Border Grid.Row="1" BorderBrush="#2A2A32" BorderThickness="0,0,0,1"
+                Background="#111114" Padding="32,24">
+            <StackPanel Orientation="Horizontal" Spacing="24" VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="NOTE MOYENNE"
+                               FontSize="9"
+                               CharacterSpacing="200"
+                               Foreground="#6B6B7A"
+                               Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding NoteMoyenne}"
+                                   FontFamily="Bebas Neue"
+                                   FontSize="56"
+                                   Foreground="#E8192C"/>
+                        <TextBlock Text="/ 5"
+                                   FontFamily="Bebas Neue"
+                                   FontSize="24"
+                                   Foreground="#2A2A32"
+                                   VerticalAlignment="Bottom"
+                                   Margin="0,0,0,10"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Border Width="1" Background="#2A2A32" Margin="0,4,0,4"/>
+
+                <StackPanel>
+                    <TextBlock Text="NOMBRE D'AVIS"
+                               FontSize="9"
+                               CharacterSpacing="200"
+                               Foreground="#6B6B7A"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding AvisList.Count}"
+                               FontFamily="Bebas Neue"
+                               FontSize="56"
+                               Foreground="White"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Cartes avis -->
+        <ScrollViewer Grid.Row="2" Padding="32,24">
+            <ItemsControl ItemsSource="{Binding AvisList}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="300"
+                                Margin="0,0,16,16"
+                                Background="#111114"
+                                BorderBrush="#2A2A32"
+                                BorderThickness="1"
+                                CornerRadius="2">
+                            <Grid>
+                                <Border Height="2" Background="#E8192C"
+                                        VerticalAlignment="Top" CornerRadius="2,2,0,0"/>
+                                <StackPanel Padding="20,24,20,20" Spacing="0">
+
+                                    <!-- Auteur -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
+                                        <Border Background="#7A0D17" CornerRadius="2" Width="32" Height="32">
+                                            <TextBlock FontFamily="Bebas Neue" FontSize="13"
+                                                       Foreground="#E8192C"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding PrenomUtilisateur}"/>
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock FontSize="13" FontWeight="Medium" Foreground="White">
+                                                <Run Text="{Binding PrenomUtilisateur}"/>
+                                                <Run Text="{Binding NomUtilisateur}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="Utilisateur" FontSize="10" Foreground="#6B6B7A"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Titre -->
+                                    <TextBlock Text="{Binding Titre}"
+                                               FontFamily="Bebas Neue"
+                                               FontSize="18"
+                                               CharacterSpacing="10"
+                                               Foreground="White"
+                                               Margin="0,0,0,8"/>
+
+                                    <!-- Texte -->
+                                    <TextBlock Text="{Binding Texte}"
+                                               FontSize="12"
+                                               Foreground="#A0A0B0"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,16"/>
+
+                                    <Border Height="1" Background="#2A2A32" Margin="0,0,0,16"/>
+
+                                    <!-- Note -->
+                                    <StackPanel>
+                                        <TextBlock Text="NOTE" FontSize="9" CharacterSpacing="200" Foreground="#6B6B7A"/>
+                                        <TextBlock Text="{Binding Note}"
+                                                   FontFamily="Bebas Neue"
+                                                   FontSize="28"
+                                                   Foreground="#E8192C"
+                                                   Margin="0,4,0,0"/>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Page>
