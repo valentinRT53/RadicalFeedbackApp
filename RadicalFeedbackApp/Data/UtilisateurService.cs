@@ -1,5 +1,6 @@
-﻿using RadicalFeedbackApp.Models;
-using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
+using RadicalFeedbackApp.Models;
+using System;
 using System.Collections.Generic;
 
 namespace RadicalFeedbackApp.Data
@@ -23,21 +24,20 @@ namespace RadicalFeedbackApp.Data
         LEFT JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
         LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 utilisateurs.Add(new Utilisateur
                 {
-                    Id = reader.GetInt32("ID_UTILISATEUR"),
-                    IdAbonnement = reader.GetInt32("ID_ABONNEMENT"),
-                    Nom = reader.GetString("NOM_UTILISTEUR"),
-                    Prenom = reader.GetString("PRENOM_UTILISTAUR"),
-                    Email = reader.GetString("EMAIL_UTILISATEUR"),
-                    Ville = reader.GetString("VILLE_UTILISATEUR"),
-                    Statut = reader.GetString("STATUT_UTILISATEUR"),
-                    Role = reader.IsDBNull(reader.GetOrdinal("NOM_ROLE"))
-                           ? "Aucun" : reader.GetString("NOM_ROLE")
+                    Id = Convert.ToInt32(reader["ID_UTILISATEUR"]),
+                    IdAbonnement = Convert.ToInt32(reader["ID_ABONNEMENT"]),
+                    Nom = reader["NOM_UTILISTEUR"].ToString(),
+                    Prenom = reader["PRENOM_UTILISTAUR"].ToString(),
+                    Email = reader["EMAIL_UTILISATEUR"].ToString(),
+                    Ville = reader["VILLE_UTILISATEUR"].ToString(),
+                    Statut = reader["STATUT_UTILISATEUR"].ToString(),
+                    Role = reader["NOM_ROLE"] == DBNull.Value ? "Aucun" : reader["NOM_ROLE"].ToString()
                 });
             }
             return utilisateurs;
@@ -53,34 +53,31 @@ namespace RadicalFeedbackApp.Data
                 INSERT INTO UTILISATEUR 
                 (ID_ABONNEMENT, NOM_UTILISTEUR, PRENOM_UTILISTAUR, EMAIL_UTILISATEUR, 
                  VILLE_UTILISATEUR, STATUT_UTILISATEUR, DATECREATION_UTILISATEUR)
-                VALUES (@idAbo, @nom, @prenom, @email, @ville, @statut, CURDATE())";
+                VALUES (@idAbo, @nom, @prenom, @email, @ville, @statut, GETDATE());
+                SELECT SCOPE_IDENTITY();"; // récupère l'ID généré
 
-            using var cmdUser = new MySqlCommand(queryUser, conn);
+            using var cmdUser = new SqlCommand(queryUser, conn);
             cmdUser.Parameters.AddWithValue("@idAbo", u.IdAbonnement);
             cmdUser.Parameters.AddWithValue("@nom", u.Nom);
             cmdUser.Parameters.AddWithValue("@prenom", u.Prenom);
             cmdUser.Parameters.AddWithValue("@email", u.Email);
             cmdUser.Parameters.AddWithValue("@ville", u.Ville);
             cmdUser.Parameters.AddWithValue("@statut", u.Statut);
-            cmdUser.ExecuteNonQuery();
-
-            // Récupère l'ID généré
-            long newId = cmdUser.LastInsertedId;
+            int newId = Convert.ToInt32(cmdUser.ExecuteScalar());
 
             // Insère la connexion
             string queryConn = @"
                 INSERT INTO CONNEXION (ID_UTILISATEUR, LOGIN_CONNEXION, MPD_CONNEXION)
                 VALUES (@id, @login, @mdp)";
-            using var cmdConn = new MySqlCommand(queryConn, conn);
+            using var cmdConn = new SqlCommand(queryConn, conn);
             cmdConn.Parameters.AddWithValue("@id", newId);
             cmdConn.Parameters.AddWithValue("@login", login);
             cmdConn.Parameters.AddWithValue("@mdp", mdp);
             cmdConn.ExecuteNonQuery();
 
-            // Attribue le rôle Utilisateur
-            string queryRole = @"
-                INSERT INTO OBTENIR (ID_UTILISATEUR, ID_ROLE) VALUES (@id, 2)";
-            using var cmdRole = new MySqlCommand(queryRole, conn);
+            // Attribue le rôle Utilisateur (ID_ROLE = 2)
+            string queryRole = @"INSERT INTO OBTENIR (ID_UTILISATEUR, ID_ROLE) VALUES (@id, 2)";
+            using var cmdRole = new SqlCommand(queryRole, conn);
             cmdRole.Parameters.AddWithValue("@id", newId);
             cmdRole.ExecuteNonQuery();
         }
@@ -100,7 +97,7 @@ namespace RadicalFeedbackApp.Data
                     ID_ABONNEMENT = @idAbo
                 WHERE ID_UTILISATEUR = @id";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@nom", u.Nom);
             cmd.Parameters.AddWithValue("@prenom", u.Prenom);
             cmd.Parameters.AddWithValue("@email", u.Email);
@@ -116,7 +113,6 @@ namespace RadicalFeedbackApp.Data
             using var conn = db.GetConnection();
             if (conn == null) return;
 
-            // Supprime dans l'ordre des FK
             foreach (var q in new[]
             {
                 "DELETE FROM DISPONIBILITE WHERE ID_UTILISATEUR = @id",
@@ -127,7 +123,7 @@ namespace RadicalFeedbackApp.Data
                 "DELETE FROM UTILISATEUR WHERE ID_UTILISATEUR = @id"
             })
             {
-                using var cmd = new MySqlCommand(q, conn);
+                using var cmd = new SqlCommand(q, conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.ExecuteNonQuery();
             }
@@ -139,7 +135,7 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return;
 
             string query = "UPDATE CONNEXION SET MPD_CONNEXION = @mdp WHERE ID_UTILISATEUR = @id";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@mdp", nouveauMdp);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();

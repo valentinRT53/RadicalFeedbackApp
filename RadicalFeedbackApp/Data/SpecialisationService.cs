@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
 using RadicalFeedbackApp.Models;
 using System.Collections.Generic;
 
@@ -15,16 +15,16 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return liste;
 
             string query = "SELECT ID_SPECIALISATION, NOM_SPECIALISATION, DESCRIPTION_SPECIALISATION FROM SPECIALISATION";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 liste.Add(new Specialisation
                 {
-                    Id = reader.GetInt32("ID_SPECIALISATION"),
-                    Nom = reader.GetString("NOM_SPECIALISATION"),
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_SPECIALISATION")),
+                    Nom = reader.GetString(reader.GetOrdinal("NOM_SPECIALISATION")),
                     Description = reader.IsDBNull(reader.GetOrdinal("DESCRIPTION_SPECIALISATION"))
-                        ? "" : reader.GetString("DESCRIPTION_SPECIALISATION")
+                        ? "" : reader.GetString(reader.GetOrdinal("DESCRIPTION_SPECIALISATION"))
                 });
             }
             return liste;
@@ -42,17 +42,17 @@ namespace RadicalFeedbackApp.Data
                 JOIN EXPERT_SPECIALISATION es ON s.ID_SPECIALISATION = es.ID_SPECIALISATION
                 WHERE es.ID_UTILISATEUR = @id";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", idExpert);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 liste.Add(new Specialisation
                 {
-                    Id = reader.GetInt32("ID_SPECIALISATION"),
-                    Nom = reader.GetString("NOM_SPECIALISATION"),
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_SPECIALISATION")),
+                    Nom = reader.GetString(reader.GetOrdinal("NOM_SPECIALISATION")),
                     Description = reader.IsDBNull(reader.GetOrdinal("DESCRIPTION_SPECIALISATION"))
-                        ? "" : reader.GetString("DESCRIPTION_SPECIALISATION")
+                        ? "" : reader.GetString(reader.GetOrdinal("DESCRIPTION_SPECIALISATION"))
                 });
             }
             return liste;
@@ -65,7 +65,7 @@ namespace RadicalFeedbackApp.Data
 
             string query = @"INSERT INTO SPECIALISATION (NOM_SPECIALISATION, DESCRIPTION_SPECIALISATION)
                              VALUES (@nom, @desc)";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@nom", s.Nom);
             cmd.Parameters.AddWithValue("@desc", s.Description ?? "");
             cmd.ExecuteNonQuery();
@@ -79,7 +79,7 @@ namespace RadicalFeedbackApp.Data
             string query = @"UPDATE SPECIALISATION SET NOM_SPECIALISATION = @nom,
                              DESCRIPTION_SPECIALISATION = @desc
                              WHERE ID_SPECIALISATION = @id";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@nom", s.Nom);
             cmd.Parameters.AddWithValue("@desc", s.Description ?? "");
             cmd.Parameters.AddWithValue("@id", s.Id);
@@ -93,12 +93,12 @@ namespace RadicalFeedbackApp.Data
 
             // Supprime les liaisons d'abord
             string queryLiaison = "DELETE FROM EXPERT_SPECIALISATION WHERE ID_SPECIALISATION = @id";
-            using var cmdLiaison = new MySqlCommand(queryLiaison, conn);
+            using var cmdLiaison = new SqlCommand(queryLiaison, conn);
             cmdLiaison.Parameters.AddWithValue("@id", id);
             cmdLiaison.ExecuteNonQuery();
 
             string query = "DELETE FROM SPECIALISATION WHERE ID_SPECIALISATION = @id";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
@@ -110,7 +110,7 @@ namespace RadicalFeedbackApp.Data
 
             // Supprime les anciennes liaisons
             string deleteQuery = "DELETE FROM EXPERT_SPECIALISATION WHERE ID_UTILISATEUR = @id";
-            using var deleteCmd = new MySqlCommand(deleteQuery, conn);
+            using var deleteCmd = new SqlCommand(deleteQuery, conn);
             deleteCmd.Parameters.AddWithValue("@id", idExpert);
             deleteCmd.ExecuteNonQuery();
 
@@ -119,7 +119,7 @@ namespace RadicalFeedbackApp.Data
             {
                 string insertQuery = @"INSERT INTO EXPERT_SPECIALISATION (ID_UTILISATEUR, ID_SPECIALISATION)
                                       VALUES (@idUser, @idSpec)";
-                using var insertCmd = new MySqlCommand(insertQuery, conn);
+                using var insertCmd = new SqlCommand(insertQuery, conn);
                 insertCmd.Parameters.AddWithValue("@idUser", idExpert);
                 insertCmd.Parameters.AddWithValue("@idSpec", idSpec);
                 insertCmd.ExecuteNonQuery();

@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
 using RadicalFeedbackApp.Models;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace RadicalFeedbackApp.Data
                 WHERE ID_UTILISATEUR = @id
                 AND DATE_DISPO BETWEEN @lundi AND @dimanche";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", idUtilisateur);
             cmd.Parameters.AddWithValue("@lundi", lundi);
             cmd.Parameters.AddWithValue("@dimanche", dimanche);
@@ -38,11 +38,11 @@ namespace RadicalFeedbackApp.Data
             {
                 liste.Add(new Disponibilite
                 {
-                    Id = reader.GetInt32("ID_DISPONIBILITE"),
-                    IdUtilisateur = reader.GetInt32("ID_UTILISATEUR"),
-                    Date = reader.GetDateTime("DATE_DISPO"),
-                    Heure = reader.GetInt32("HEURE_DISPO"),
-                    Present = reader.GetBoolean("PRESENT")
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_DISPONIBILITE")),
+                    IdUtilisateur = reader.GetInt32(reader.GetOrdinal("ID_UTILISATEUR")),
+                    Date = reader.GetDateTime(reader.GetOrdinal("DATE_DISPO")),
+                    Heure = reader.GetInt32(reader.GetOrdinal("HEURE_DISPO")),
+                    Present = reader.GetBoolean(reader.GetOrdinal("PRESENT"))
                 });
             }
             return liste;
@@ -65,12 +65,12 @@ namespace RadicalFeedbackApp.Data
                 SELECT COUNT(*) FROM DISPONIBILITE
                 WHERE ID_UTILISATEUR = @id AND DATE_DISPO = @date AND HEURE_DISPO = @heure";
 
-            using var checkCmd = new MySqlCommand(checkQuery, conn);
+            using var checkCmd = new SqlCommand(checkQuery, conn);
             checkCmd.Parameters.AddWithValue("@id", idUtilisateur);
             checkCmd.Parameters.AddWithValue("@date", date);
             checkCmd.Parameters.AddWithValue("@heure", heure);
 
-            long count = (long)checkCmd.ExecuteScalar();
+            int count = (int)checkCmd.ExecuteScalar();
 
             if (count > 0)
             {
@@ -79,7 +79,7 @@ namespace RadicalFeedbackApp.Data
                     UPDATE DISPONIBILITE SET PRESENT = @present
                     WHERE ID_UTILISATEUR = @id AND DATE_DISPO = @date AND HEURE_DISPO = @heure";
 
-                using var updateCmd = new MySqlCommand(updateQuery, conn);
+                using var updateCmd = new SqlCommand(updateQuery, conn);
                 updateCmd.Parameters.AddWithValue("@present", present);
                 updateCmd.Parameters.AddWithValue("@id", idUtilisateur);
                 updateCmd.Parameters.AddWithValue("@date", date);
@@ -93,7 +93,7 @@ namespace RadicalFeedbackApp.Data
                     INSERT INTO DISPONIBILITE (ID_UTILISATEUR, DATE_DISPO, HEURE_DISPO, PRESENT)
                     VALUES (@id, @date, @heure, @present)";
 
-                using var insertCmd = new MySqlCommand(insertQuery, conn);
+                using var insertCmd = new SqlCommand(insertQuery, conn);
                 insertCmd.Parameters.AddWithValue("@id", idUtilisateur);
                 insertCmd.Parameters.AddWithValue("@date", date);
                 insertCmd.Parameters.AddWithValue("@heure", heure);
@@ -110,17 +110,18 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return liste;
 
             string query = @"
-        SELECT u.ID_UTILISATEUR, c.LOGIN_CONNEXION
-        FROM UTILISATEUR u
-        JOIN CONNEXION c ON u.ID_UTILISATEUR = c.ID_UTILISATEUR
-        JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
-        JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE
-        WHERE r.NOM_ROLE = 'Expert'";
+                SELECT u.ID_UTILISATEUR, c.LOGIN_CONNEXION
+                FROM UTILISATEUR u
+                JOIN CONNEXION c ON u.ID_UTILISATEUR = c.ID_UTILISATEUR
+                JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
+                JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE
+                WHERE r.NOM_ROLE = 'Expert'";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
-                liste.Add((reader.GetInt32("ID_UTILISATEUR"), reader.GetString("LOGIN_CONNEXION")));
+                liste.Add((reader.GetInt32(reader.GetOrdinal("ID_UTILISATEUR")),
+                           reader.GetString(reader.GetOrdinal("LOGIN_CONNEXION"))));
             return liste;
         }
     }

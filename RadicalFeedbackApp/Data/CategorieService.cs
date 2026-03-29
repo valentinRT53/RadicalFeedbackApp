@@ -1,5 +1,5 @@
 ﻿using RadicalFeedbackApp.Models;
-using MySql.Data.MySqlClient;
+using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 
 namespace RadicalFeedbackApp.Data
@@ -14,15 +14,16 @@ namespace RadicalFeedbackApp.Data
             using var conn = db.GetConnection();
             if (conn == null) return liste;
 
+            // Requête SQL Server
             string query = "SELECT ID_CAT, NOM_CAT FROM CATEGORIE";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 liste.Add(new Categorie
                 {
-                    Id = reader.GetInt32("ID_CAT"),
-                    Nom = reader.GetString("NOM_CAT")
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_CAT")),
+                    Nom = reader.GetString(reader.GetOrdinal("NOM_CAT"))
                 });
             }
             return liste;

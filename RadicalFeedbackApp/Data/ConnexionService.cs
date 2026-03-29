@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
+using System;
 
 namespace RadicalFeedbackApp.Data
 {
@@ -19,15 +20,15 @@ namespace RadicalFeedbackApp.Data
                 WHERE c.LOGIN_CONNEXION = @login AND c.MPD_CONNEXION = @mdp
                 AND r.NOM_ROLE IN ('Admin', 'Expert')";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@login", login);
             cmd.Parameters.AddWithValue("@mdp", mdp);
 
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                int idUtilisateur = reader.GetInt32("ID_UTILISATEUR");
-                string role = reader.GetString("NOM_ROLE");
+                int idUtilisateur = Convert.ToInt32(reader["ID_UTILISATEUR"]);
+                string role = reader.GetString(reader.GetOrdinal("NOM_ROLE"));
                 return (true, idUtilisateur, role);
             }
 

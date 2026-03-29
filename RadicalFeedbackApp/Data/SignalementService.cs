@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
 using RadicalFeedbackApp.Helpers;
 using RadicalFeedbackApp.Models;
 using System;
@@ -40,7 +40,7 @@ namespace RadicalFeedbackApp.Data
                 WHERE s.ID_EXPERT = @id
                 ORDER BY s.DATE_SIGNALEMENT DESC";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             if (!Session.EstAdmin)
                 cmd.Parameters.AddWithValue("@id", Session.IdUtilisateur);
 
@@ -49,24 +49,24 @@ namespace RadicalFeedbackApp.Data
             {
                 liste.Add(new Signalement
                 {
-                    Id = reader.GetInt32("ID_SIGNALEMENT"),
-                    IdUtilisateur = reader.GetInt32("ID_UTILISATEUR"),
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_SIGNALEMENT")),
+                    IdUtilisateur = reader.GetInt32(reader.GetOrdinal("ID_UTILISATEUR")),
                     IdExpert = reader.IsDBNull(reader.GetOrdinal("ID_EXPERT"))
-                        ? null : reader.GetInt32("ID_EXPERT"),
+                        ? null : reader.GetInt32(reader.GetOrdinal("ID_EXPERT")),
                     IdConversation = reader.IsDBNull(reader.GetOrdinal("ID__CONV"))
-                        ? null : reader.GetInt32("ID__CONV"),
-                    Categorie = reader.GetString("CATEGORIE_SIGNALEMENT"),
+                        ? null : reader.GetInt32(reader.GetOrdinal("ID__CONV")),
+                    Categorie = reader.GetString(reader.GetOrdinal("CATEGORIE_SIGNALEMENT")),
                     Commentaire = reader.IsDBNull(reader.GetOrdinal("COMMENTAIRE"))
-                        ? "" : reader.GetString("COMMENTAIRE"),
-                    DateSignalement = reader.GetDateTime("DATE_SIGNALEMENT"),
-                    NomUtilisateur = reader.GetString("NOM_UTILISTEUR"),
-                    PrenomUtilisateur = reader.GetString("PRENOM_UTILISTAUR"),
+                        ? "" : reader.GetString(reader.GetOrdinal("COMMENTAIRE")),
+                    DateSignalement = reader.GetDateTime(reader.GetOrdinal("DATE_SIGNALEMENT")),
+                    NomUtilisateur = reader.GetString(reader.GetOrdinal("NOM_UTILISTEUR")),
+                    PrenomUtilisateur = reader.GetString(reader.GetOrdinal("PRENOM_UTILISTAUR")),
                     NomExpert = reader.IsDBNull(reader.GetOrdinal("NOM_EXPERT"))
-                        ? "" : reader.GetString("NOM_EXPERT"),
+                        ? "" : reader.GetString(reader.GetOrdinal("NOM_EXPERT")),
                     PrenomExpert = reader.IsDBNull(reader.GetOrdinal("PRENOM_EXPERT"))
-                        ? "" : reader.GetString("PRENOM_EXPERT"),
+                        ? "" : reader.GetString(reader.GetOrdinal("PRENOM_EXPERT")),
                     TitreConversation = reader.IsDBNull(reader.GetOrdinal("TITRE_CONV"))
-                        ? "" : reader.GetString("TITRE_CONV")
+                        ? "" : reader.GetString(reader.GetOrdinal("TITRE_CONV"))
                 });
             }
             return liste;
@@ -78,7 +78,7 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return;
 
             string query = "DELETE FROM SIGNALEMENT WHERE ID_SIGNALEMENT = @id";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
@@ -90,11 +90,11 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return messages;
 
             string query = "SELECT TEXT_MESSAGE FROM MESSAGE WHERE ID__CONV = @id ORDER BY ID_MESSAGE";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", idConv);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
-                messages.Add(reader.GetString("TEXT_MESSAGE"));
+                messages.Add(reader.GetString(reader.GetOrdinal("TEXT_MESSAGE")));
             return messages;
         }
     }

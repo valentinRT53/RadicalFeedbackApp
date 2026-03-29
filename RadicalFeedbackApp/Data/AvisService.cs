@@ -1,5 +1,4 @@
-﻿using MySql.Data.MySqlClient;
-using RadicalFeedbackApp.Helpers;
+﻿using Microsoft.Data.SqlClient;
 using RadicalFeedbackApp.Models;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,7 @@ namespace RadicalFeedbackApp.Data
                 WHERE a.ID_EXPERT = @idExpert
                 ORDER BY a.ID_AVIS DESC";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@idExpert", idExpert);
 
             using var reader = cmd.ExecuteReader();
@@ -33,15 +32,15 @@ namespace RadicalFeedbackApp.Data
             {
                 liste.Add(new Avis
                 {
-                    Id = reader.GetInt32("ID_AVIS"),
-                    IdConversation = reader.GetInt32("ID__CONV"),
-                    IdUtilisateur = reader.GetInt32("ID_UTILISATEUR"),
-                    IdExpert = reader.GetInt32("ID_EXPERT"),
-                    Titre = reader.GetString("TITRE_AVIS"),
-                    Texte = reader.GetString("TEXTE_AVIS"),
-                    Note = reader.GetDouble("NOTE_AVIS"),
-                    NomUtilisateur = reader.GetString("NOM_UTILISTEUR"),
-                    PrenomUtilisateur = reader.GetString("PRENOM_UTILISTAUR")
+                    Id = Convert.ToInt32(reader["ID_AVIS"]),
+                    IdConversation = Convert.ToInt32(reader["ID__CONV"]),
+                    IdUtilisateur = Convert.ToInt32(reader["ID_UTILISATEUR"]),
+                    IdExpert = Convert.ToInt32(reader["ID_EXPERT"]),
+                    Titre = reader["TITRE_AVIS"]?.ToString(),
+                    Texte = reader["TEXTE_AVIS"]?.ToString(),
+                    Note = Convert.ToDouble(reader["NOTE_AVIS"]),
+                    NomUtilisateur = reader["NOM_UTILISTEUR"]?.ToString(),
+                    PrenomUtilisateur = reader["PRENOM_UTILISTAUR"]?.ToString()
                 });
             }
             return liste;
@@ -53,12 +52,13 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return 0;
 
             string query = "SELECT AVG(NOTE_AVIS) FROM AVIS WHERE ID_EXPERT = @id";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", idExpert);
 
             var result = cmd.ExecuteScalar();
-            if (result == null || result == System.DBNull.Value) return 0;
-            return System.Math.Round(Convert.ToDouble(result), 1);
+            if (result == null || result == DBNull.Value) return 0;
+
+            return Math.Round(Convert.ToDouble(result), 1);
         }
 
         public List<(int id, string prenom, string nom)> GetTousLesExperts()
@@ -74,14 +74,15 @@ namespace RadicalFeedbackApp.Data
                 JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE
                 WHERE r.NOM_ROLE = 'Expert'";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
+
             while (reader.Read())
             {
                 liste.Add((
-                    reader.GetInt32("ID_UTILISATEUR"),
-                    reader.GetString("PRENOM_UTILISTAUR"),
-                    reader.GetString("NOM_UTILISTEUR")
+                    Convert.ToInt32(reader["ID_UTILISATEUR"]),
+                    reader["PRENOM_UTILISTAUR"].ToString(),
+                    reader["NOM_UTILISTEUR"].ToString()
                 ));
             }
             return liste;

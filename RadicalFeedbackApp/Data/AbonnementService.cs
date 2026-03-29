@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
 using RadicalFeedbackApp.Models;
 using System;
 using System.Collections.Generic;
@@ -16,15 +16,16 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return liste;
 
             string query = "SELECT ID_ABONNEMENT, DATESOUSCRIPTION_ABONNEMENT, PRIX_ABONNEMENT FROM ABONNEMENT";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
+
             while (reader.Read())
             {
                 liste.Add(new Abonnement
                 {
-                    Id = reader.GetInt32("ID_ABONNEMENT"),
-                    DateSouscription = reader.GetDateTime("DATESOUSCRIPTION_ABONNEMENT"),
-                    Prix = reader.GetDouble("PRIX_ABONNEMENT")
+                    Id = reader.GetInt16(reader.GetOrdinal("ID_ABONNEMENT")),
+                    DateSouscription = reader.GetDateTime(reader.GetOrdinal("DATESOUSCRIPTION_ABONNEMENT")),
+                    Prix = Convert.ToDouble(reader["PRIX_ABONNEMENT"])
                 });
             }
             return liste;
@@ -45,21 +46,23 @@ namespace RadicalFeedbackApp.Data
                 LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE
                 WHERE u.ID_ABONNEMENT = @id";
 
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", idAbonnement);
+
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 liste.Add(new Utilisateur
                 {
-                    Id = reader.GetInt32("ID_UTILISATEUR"),
-                    Nom = reader.GetString("NOM_UTILISTEUR"),
-                    Prenom = reader.GetString("PRENOM_UTILISTAUR"),
-                    Email = reader.GetString("EMAIL_UTILISATEUR"),
-                    Ville = reader.GetString("VILLE_UTILISATEUR"),
-                    Statut = reader.GetString("STATUT_UTILISATEUR"),
-                    Role = reader.IsDBNull(reader.GetOrdinal("NOM_ROLE"))
-                           ? "Aucun" : reader.GetString("NOM_ROLE")
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_UTILISATEUR")),
+                    Nom = reader["NOM_UTILISTEUR"].ToString(),
+                    Prenom = reader["PRENOM_UTILISTAUR"].ToString(),
+                    Email = reader["EMAIL_UTILISATEUR"].ToString(),
+                    Ville = reader["VILLE_UTILISATEUR"].ToString(),
+                    Statut = reader["STATUT_UTILISATEUR"].ToString(),
+                    Role = reader["NOM_ROLE"] == DBNull.Value
+                           ? "Aucun"
+                           : reader["NOM_ROLE"].ToString()
                 });
             }
             return liste;
@@ -72,7 +75,7 @@ namespace RadicalFeedbackApp.Data
 
             string query = @"INSERT INTO ABONNEMENT (DATESOUSCRIPTION_ABONNEMENT, PRIX_ABONNEMENT)
                              VALUES (@date, @prix)";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@date", a.DateSouscription);
             cmd.Parameters.AddWithValue("@prix", a.Prix);
             cmd.ExecuteNonQuery();
@@ -83,14 +86,13 @@ namespace RadicalFeedbackApp.Data
             using var conn = db.GetConnection();
             if (conn == null) return;
 
-            // Réassigne les utilisateurs à aucun abonnement avant suppression
             string queryUpdate = "UPDATE UTILISATEUR SET ID_ABONNEMENT = NULL WHERE ID_ABONNEMENT = @id";
-            using var cmdUpdate = new MySqlCommand(queryUpdate, conn);
+            using var cmdUpdate = new SqlCommand(queryUpdate, conn);
             cmdUpdate.Parameters.AddWithValue("@id", id);
             cmdUpdate.ExecuteNonQuery();
 
             string query = "DELETE FROM ABONNEMENT WHERE ID_ABONNEMENT = @id";
-            using var cmd = new MySqlCommand(query, conn);
+            using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }

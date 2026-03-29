@@ -1,17 +1,17 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System;
 
 namespace RadicalFeedbackApp.Data
 {
     public class Database
     {
-        private string connectionString = "server=localhost;database=radical_feedback;user=root;password=;";
+        private string connectionString = "Server=192.168.152.253;Database=radical_feedback;User Id=sa;Password=P@ssw0rd2025;TrustServerCertificate=True;";
 
-        public MySqlConnection GetConnection()
+        public SqlConnection GetConnection()
         {
             try
             {
-                var conn = new MySqlConnection(connectionString);
+                var conn = new SqlConnection(connectionString);
                 conn.Open();
                 return conn;
             }
