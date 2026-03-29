@@ -16,13 +16,13 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return utilisateurs;
 
             string query = @"
-        SELECT u.ID_UTILISATEUR, u.ID_ABONNEMENT, u.NOM_UTILISTEUR, 
-               u.PRENOM_UTILISTAUR, u.EMAIL_UTILISATEUR, 
-               u.VILLE_UTILISATEUR, u.STATUT_UTILISATEUR,
-               r.NOM_ROLE
-        FROM UTILISATEUR u
-        LEFT JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
-        LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE";
+SELECT u.ID_UTILISATEUR, u.ID_ABONNEMENT, u.NOM_UTILISATEUR,
+       u.PRENOM_UTILISATEUR, u.EMAIL_UTILISATEUR,
+       u.VILLE_UTILISATEUR, u.STATUT_UTILISATEUR,
+       r.NOM_ROLE
+FROM UTILISATEUR u
+LEFT JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
+LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE";
 
             using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
@@ -30,10 +30,10 @@ namespace RadicalFeedbackApp.Data
             {
                 utilisateurs.Add(new Utilisateur
                 {
-                    Id = Convert.ToInt32(reader["ID_UTILISATEUR"]),
-                    IdAbonnement = Convert.ToInt32(reader["ID_ABONNEMENT"]),
-                    Nom = reader["NOM_UTILISTEUR"].ToString(),
-                    Prenom = reader["PRENOM_UTILISTAUR"].ToString(),
+                    Id = (int)reader["ID_UTILISATEUR"],
+                    IdAbonnement = (int)reader["ID_ABONNEMENT"],
+                    Nom = reader["NOM_UTILISATEUR"].ToString(),
+                    Prenom = reader["PRENOM_UTILISATEUR"].ToString(),
                     Email = reader["EMAIL_UTILISATEUR"].ToString(),
                     Ville = reader["VILLE_UTILISATEUR"].ToString(),
                     Statut = reader["STATUT_UTILISATEUR"].ToString(),
@@ -51,7 +51,7 @@ namespace RadicalFeedbackApp.Data
             // Insère l'utilisateur
             string queryUser = @"
                 INSERT INTO UTILISATEUR 
-                (ID_ABONNEMENT, NOM_UTILISTEUR, PRENOM_UTILISTAUR, EMAIL_UTILISATEUR, 
+                (ID_ABONNEMENT, NOM_UTILISATEUR, PRENOM_UTILISATEUR, EMAIL_UTILISATEUR, 
                  VILLE_UTILISATEUR, STATUT_UTILISATEUR, DATECREATION_UTILISATEUR)
                 VALUES (@idAbo, @nom, @prenom, @email, @ville, @statut, GETDATE());
                 SELECT SCOPE_IDENTITY();"; // récupère l'ID généré
@@ -89,8 +89,8 @@ namespace RadicalFeedbackApp.Data
 
             string query = @"
                 UPDATE UTILISATEUR SET
-                    NOM_UTILISTEUR = @nom,
-                    PRENOM_UTILISTAUR = @prenom,
+                    NOM_UTILISATEUR = @nom,
+                    PRENOM_UTILISATEUR = @prenom,
                     EMAIL_UTILISATEUR = @email,
                     VILLE_UTILISATEUR = @ville,
                     STATUT_UTILISATEUR = @statut,

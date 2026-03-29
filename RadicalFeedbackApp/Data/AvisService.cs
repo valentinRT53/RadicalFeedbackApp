@@ -16,9 +16,9 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return liste;
 
             string query = @"
-                SELECT a.ID_AVIS, a.ID__CONV, a.ID_UTILISATEUR, a.ID_EXPERT,
+                SELECT a.ID_AVIS, a.ID_CONV, a.ID_UTILISATEUR, a.ID_EXPERT,
                        a.TITRE_AVIS, a.TEXTE_AVIS, a.NOTE_AVIS,
-                       u.NOM_UTILISTEUR, u.PRENOM_UTILISTAUR
+                       u.NOM_UTILISATEUR, u.PRENOM_UTILISATEUR
                 FROM AVIS a
                 JOIN UTILISATEUR u ON a.ID_UTILISATEUR = u.ID_UTILISATEUR
                 WHERE a.ID_EXPERT = @idExpert
@@ -33,14 +33,14 @@ namespace RadicalFeedbackApp.Data
                 liste.Add(new Avis
                 {
                     Id = Convert.ToInt32(reader["ID_AVIS"]),
-                    IdConversation = Convert.ToInt32(reader["ID__CONV"]),
+                    IdConversation = Convert.ToInt32(reader["ID_CONV"]),
                     IdUtilisateur = Convert.ToInt32(reader["ID_UTILISATEUR"]),
                     IdExpert = Convert.ToInt32(reader["ID_EXPERT"]),
                     Titre = reader["TITRE_AVIS"]?.ToString(),
                     Texte = reader["TEXTE_AVIS"]?.ToString(),
                     Note = Convert.ToDouble(reader["NOTE_AVIS"]),
-                    NomUtilisateur = reader["NOM_UTILISTEUR"]?.ToString(),
-                    PrenomUtilisateur = reader["PRENOM_UTILISTAUR"]?.ToString()
+                    NomUtilisateur = reader["NOM_UTILISATEUR"]?.ToString(),
+                    PrenomUtilisateur = reader["PRENOM_UTILISATEUR"]?.ToString()
                 });
             }
             return liste;
@@ -68,7 +68,7 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return liste;
 
             string query = @"
-                SELECT u.ID_UTILISATEUR, u.PRENOM_UTILISTAUR, u.NOM_UTILISTEUR
+                SELECT u.ID_UTILISATEUR,u.PRENOM_UTILISATEUR, u.NOM_UTILISATEUR
                 FROM UTILISATEUR u
                 JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
                 JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE
@@ -81,8 +81,8 @@ namespace RadicalFeedbackApp.Data
             {
                 liste.Add((
                     Convert.ToInt32(reader["ID_UTILISATEUR"]),
-                    reader["PRENOM_UTILISTAUR"].ToString(),
-                    reader["NOM_UTILISTEUR"].ToString()
+                    reader["PRENOM_UTILISATEUR"].ToString(),
+reader["NOM_UTILISATEUR"].ToString()
                 ));
             }
             return liste;

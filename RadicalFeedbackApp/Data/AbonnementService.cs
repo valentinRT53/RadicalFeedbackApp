@@ -23,7 +23,7 @@ namespace RadicalFeedbackApp.Data
             {
                 liste.Add(new Abonnement
                 {
-                    Id = reader.GetInt16(reader.GetOrdinal("ID_ABONNEMENT")),
+                    Id = reader.GetInt32(reader.GetOrdinal("ID_ABONNEMENT")),
                     DateSouscription = reader.GetDateTime(reader.GetOrdinal("DATESOUSCRIPTION_ABONNEMENT")),
                     Prix = Convert.ToDouble(reader["PRIX_ABONNEMENT"])
                 });
@@ -38,7 +38,7 @@ namespace RadicalFeedbackApp.Data
             if (conn == null) return liste;
 
             string query = @"
-                SELECT u.ID_UTILISATEUR, u.NOM_UTILISTEUR, u.PRENOM_UTILISTAUR,
+                SELECT u.ID_UTILISATEUR, u.NOM_UTILISATEUR, u.PRENOM_UTILISATEUR,
                        u.EMAIL_UTILISATEUR, u.VILLE_UTILISATEUR, u.STATUT_UTILISATEUR,
                        r.NOM_ROLE
                 FROM UTILISATEUR u
@@ -55,8 +55,8 @@ namespace RadicalFeedbackApp.Data
                 liste.Add(new Utilisateur
                 {
                     Id = reader.GetInt32(reader.GetOrdinal("ID_UTILISATEUR")),
-                    Nom = reader["NOM_UTILISTEUR"].ToString(),
-                    Prenom = reader["PRENOM_UTILISTAUR"].ToString(),
+                    Nom = reader["NOM_UTILISATEUR"].ToString(),
+                    Prenom = reader["PRENOM_UTILISATEUR"].ToString(),
                     Email = reader["EMAIL_UTILISATEUR"].ToString(),
                     Ville = reader["VILLE_UTILISATEUR"].ToString(),
                     Statut = reader["STATUT_UTILISATEUR"].ToString(),
