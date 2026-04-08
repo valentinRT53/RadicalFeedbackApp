@@ -19,23 +19,51 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Titre + label semaine -->
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="AGENDA"
                                FontFamily="Bebas Neue"
                                FontSize="28"
                                CharacterSpacing="20"
                                Foreground="White"/>
-                    <TextBlock Text="Disponibilités de la semaine"
+                    <TextBlock x:Name="LabelSemaine"
                                FontSize="12"
                                Foreground="#6B6B7A"
                                Margin="0,4,0,0"/>
                 </StackPanel>
 
+                <!-- Boutons navigation semaine -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center"
+                            Margin="0,0,16,0">
+                    <Button x:Name="BtnPrecedent"
+                            Content="← PRÉC."
+                            Background="#18181D"
+                            Foreground="#A0A0B0"
+                            FontFamily="Bebas Neue"
+                            FontSize="13"
+                            Padding="14,8"
+                            CornerRadius="2"
+                            Click="BtnPrecedent_Click"/>
+                    <Button x:Name="BtnSuivant"
+                            Content="SUIV. →"
+                            Background="#18181D"
+                            Foreground="#A0A0B0"
+                            FontFamily="Bebas Neue"
+                            FontSize="13"
+                            Padding="14,8"
+                            CornerRadius="2"
+                            Click="BtnSuivant_Click"/>
+                </StackPanel>
+
                 <!-- Menu déroulant admin -->
                 <ComboBox x:Name="UtilisateurCombo"
-                          Grid.Column="1"
+                          Grid.Column="2"
                           VerticalAlignment="Center"
                           Width="200"
                           Background="#111114"

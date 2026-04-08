@@ -28,6 +28,13 @@ namespace RadicalFeedbackApp.Data
                     Prix = Convert.ToDouble(reader["PRIX_ABONNEMENT"])
                 });
             }
+
+            reader.Close(); // ← important : fermer le reader avant de refaire des requêtes
+
+            // Charge les utilisateurs pour chaque abonnement
+            foreach (var abo in liste)
+                abo.Utilisateurs = GetUtilisateursByAbonnement(abo.Id);
+
             return liste;
         }
 

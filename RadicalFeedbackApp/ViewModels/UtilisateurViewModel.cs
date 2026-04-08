@@ -104,9 +104,9 @@ namespace RadicalFeedbackApp.ViewModels
                 Utilisateurs.Add(u);
         }
 
-        public void Ajouter(Utilisateur u, string login, string mdp)
+        public void Ajouter(Utilisateur u, string login, string mdp, int idRole)
         {
-            _service.AjouterUtilisateur(u, login, mdp);
+            _service.AjouterUtilisateur(u, login, mdp, idRole);
             LoadUtilisateurs();
         }
 

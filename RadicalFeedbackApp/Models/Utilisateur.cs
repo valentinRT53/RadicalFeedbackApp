@@ -10,5 +10,6 @@
         public string Ville { get; set; }
         public string Statut { get; set; }
         public string Role { get; set; }
+        public string Login { get; set; } // ← AJOUTER
     }
 }

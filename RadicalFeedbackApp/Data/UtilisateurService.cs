@@ -19,10 +19,12 @@ namespace RadicalFeedbackApp.Data
 SELECT u.ID_UTILISATEUR, u.ID_ABONNEMENT, u.NOM_UTILISATEUR,
        u.PRENOM_UTILISATEUR, u.EMAIL_UTILISATEUR,
        u.VILLE_UTILISATEUR, u.STATUT_UTILISATEUR,
-       r.NOM_ROLE
+       r.NOM_ROLE,
+       c.LOGIN_CONNEXION
 FROM UTILISATEUR u
 LEFT JOIN OBTENIR o ON u.ID_UTILISATEUR = o.ID_UTILISATEUR
-LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE";
+LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE
+LEFT JOIN CONNEXION c ON u.ID_UTILISATEUR = c.ID_UTILISATEUR";
 
             using var cmd = new SqlCommand(query, conn);
             using var reader = cmd.ExecuteReader();
@@ -37,13 +39,16 @@ LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE";
                     Email = reader["EMAIL_UTILISATEUR"].ToString(),
                     Ville = reader["VILLE_UTILISATEUR"].ToString(),
                     Statut = reader["STATUT_UTILISATEUR"].ToString(),
-                    Role = reader["NOM_ROLE"] == DBNull.Value ? "Aucun" : reader["NOM_ROLE"].ToString()
+                    Role = reader["NOM_ROLE"] == DBNull.Value ? "Aucun" : reader["NOM_ROLE"].ToString(),
+                    Login = reader["LOGIN_CONNEXION"] == DBNull.Value
+        ? ""
+        : reader["LOGIN_CONNEXION"].ToString()
                 });
             }
             return utilisateurs;
         }
 
-        public void AjouterUtilisateur(Utilisateur u, string login, string mdp)
+        public void AjouterUtilisateur(Utilisateur u, string login, string mdp, int idRole)
         {
             using var conn = db.GetConnection();
             if (conn == null) return;
@@ -76,9 +81,10 @@ LEFT JOIN ROLE r ON o.ID_ROLE = r.ID_ROLE";
             cmdConn.ExecuteNonQuery();
 
             // Attribue le rôle Utilisateur (ID_ROLE = 2)
-            string queryRole = @"INSERT INTO OBTENIR (ID_UTILISATEUR, ID_ROLE) VALUES (@id, 2)";
+            string queryRole = @"INSERT INTO OBTENIR (ID_UTILISATEUR, ID_ROLE) VALUES (@id, @idRole)";
             using var cmdRole = new SqlCommand(queryRole, conn);
             cmdRole.Parameters.AddWithValue("@id", newId);
+            cmdRole.Parameters.AddWithValue("@idRole", idRole);
             cmdRole.ExecuteNonQuery();
         }
 

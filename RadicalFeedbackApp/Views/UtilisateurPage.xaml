@@ -264,6 +264,21 @@
                                      Foreground="White" Padding="12,10" CornerRadius="2"/>
                         </StackPanel>
 
+                        <StackPanel x:Name="ChampRolePanel" Spacing="8">
+                            <TextBlock Text="RÔLE" FontSize="9" CharacterSpacing="200" Foreground="#6B6B7A"/>
+                            <ComboBox x:Name="ChampRole"
+              Background="#18181D"
+              BorderBrush="#2A2A32"
+              Foreground="White"
+              CornerRadius="2"
+              HorizontalAlignment="Stretch"
+              SelectedIndex="0">
+                                <ComboBoxItem Content="Utilisateur"/>
+                                <ComboBoxItem Content="Expert"/>
+                                <ComboBoxItem Content="Admin"/>
+                            </ComboBox>
+                        </StackPanel>
+
                         <StackPanel x:Name="ChampMdpPanel" Spacing="16">
                             <StackPanel Spacing="8">
                                 <TextBlock Text="NOUVEAU MOT DE PASSE"
@@ -334,6 +349,15 @@
                        Foreground="#E8192C"/>
                                 </StackPanel>
                             </Grid>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="LOGIN" FontSize="9"
+               CharacterSpacing="200" Foreground="#6B6B7A"/>
+                                <TextBlock x:Name="LabelLogin"
+               FontFamily="Bebas Neue" FontSize="20"
+               Foreground="#A0A0B0"/>
+                            </StackPanel>
+
                         </StackPanel>
 
                         <!-- Spécialisations (visible uniquement en mode modifier expert) -->

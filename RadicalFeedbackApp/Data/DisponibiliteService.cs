@@ -10,23 +10,17 @@ namespace RadicalFeedbackApp.Data
         private Database db = new Database();
 
         // Récupère les dispos d'un utilisateur pour la semaine en cours
-        public List<Disponibilite> GetDisposSemaine(int idUtilisateur)
+        public List<Disponibilite> GetDisposSemaine(int idUtilisateur, DateTime lundi, DateTime dimanche)
         {
             var liste = new List<Disponibilite>();
             using var conn = db.GetConnection();
             if (conn == null) return liste;
 
-            // Lundi et dimanche de la semaine en cours
-            DateTime aujourd_hui = DateTime.Today;
-            int diff = (7 + (int)aujourd_hui.DayOfWeek - (int)DayOfWeek.Monday) % 7;
-            DateTime lundi = aujourd_hui.AddDays(-diff);
-            DateTime dimanche = lundi.AddDays(6);
-
             string query = @"
-                SELECT ID_DISPONIBILITE, ID_UTILISATEUR, DATE_DISPO, HEURE_DISPO, PRESENT
-                FROM DISPONIBILITE
-                WHERE ID_UTILISATEUR = @id
-                AND DATE_DISPO BETWEEN @lundi AND @dimanche";
+        SELECT ID_DISPONIBILITE, ID_UTILISATEUR, DATE_DISPO, HEURE_DISPO, PRESENT
+        FROM DISPONIBILITE
+        WHERE ID_UTILISATEUR = @id
+        AND DATE_DISPO BETWEEN @lundi AND @dimanche";
 
             using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", idUtilisateur);
@@ -38,20 +32,20 @@ namespace RadicalFeedbackApp.Data
             {
                 liste.Add(new Disponibilite
                 {
-                    Id = reader.GetInt32(reader.GetOrdinal("ID_DISPONIBILITE")),
-                    IdUtilisateur = reader.GetInt32(reader.GetOrdinal("ID_UTILISATEUR")),
-                    Date = reader.GetDateTime(reader.GetOrdinal("DATE_DISPO")),
-                    Heure = reader.GetInt32(reader.GetOrdinal("HEURE_DISPO")),
-                    Present = reader.GetBoolean(reader.GetOrdinal("PRESENT"))
+                    Id = Convert.ToInt32(reader["ID_DISPONIBILITE"]),
+                    IdUtilisateur = Convert.ToInt32(reader["ID_UTILISATEUR"]),
+                    Date = Convert.ToDateTime(reader["DATE_DISPO"]),
+                    Heure = Convert.ToInt32(reader["HEURE_DISPO"]),
+                    Present = Convert.ToBoolean(reader["PRESENT"])
                 });
             }
             return liste;
         }
 
         // Récupère les dispos de TOUS les utilisateurs (admin)
-        public List<Disponibilite> GetDisposSemaineParUtilisateur(int idUtilisateur)
+        public List<Disponibilite> GetDisposSemaineParUtilisateur(int idUtilisateur, DateTime lundi, DateTime dimanche)
         {
-            return GetDisposSemaine(idUtilisateur);
+            return GetDisposSemaine(idUtilisateur, lundi, dimanche);
         }
 
         // Coche ou décoche un créneau

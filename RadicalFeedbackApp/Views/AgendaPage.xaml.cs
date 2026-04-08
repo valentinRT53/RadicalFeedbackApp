@@ -18,6 +18,8 @@ namespace RadicalFeedbackApp.Views
             this.InitializeComponent();
             _vm = (AgendaViewModel)this.DataContext;
 
+            LabelSemaine.Text = _vm.LabelSemaine;
+
             if (Session.EstAdmin)
             {
                 UtilisateurCombo.Visibility = Visibility.Visible;
@@ -28,6 +30,20 @@ namespace RadicalFeedbackApp.Views
                     UtilisateurCombo.SelectedIndex = 0;
             }
 
+            BuildAgendaGrid();
+        }
+
+        private void BtnPrecedent_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.SemainePrecedente();
+            LabelSemaine.Text = _vm.LabelSemaine;
+            BuildAgendaGrid();
+        }
+
+        private void BtnSuivant_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.SemaineSuivante();
+            LabelSemaine.Text = _vm.LabelSemaine;
             BuildAgendaGrid();
         }
 
@@ -43,12 +59,10 @@ namespace RadicalFeedbackApp.Views
             AgendaGrid.ColumnDefinitions.Clear();
             AgendaGrid.RowDefinitions.Clear();
 
-            // Colonnes : 1 pour les heures + 7 jours
             AgendaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(60) });
             for (int j = 0; j < 7; j++)
                 AgendaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            // Lignes : 1 header + 10 heures
             AgendaGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             for (int h = 0; h < _vm.Heures.Count; h++)
                 AgendaGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -99,7 +113,6 @@ namespace RadicalFeedbackApp.Views
             {
                 int heure = _vm.Heures[h];
 
-                // Label heure
                 var heureLabel = new Border
                 {
                     Padding = new Thickness(8, 12, 8, 12),
@@ -119,7 +132,6 @@ namespace RadicalFeedbackApp.Views
                 Grid.SetRow(heureLabel, h + 1);
                 AgendaGrid.Children.Add(heureLabel);
 
-                // Cases par jour
                 for (int j = 0; j < _vm.Jours.Count; j++)
                 {
                     var jour = _vm.Jours[j];
@@ -142,7 +154,7 @@ namespace RadicalFeedbackApp.Views
 
                     if (present)
                     {
-                        var dot = new Border
+                        cell.Child = new Border
                         {
                             Width = 10,
                             Height = 10,
@@ -151,7 +163,6 @@ namespace RadicalFeedbackApp.Views
                             HorizontalAlignment = HorizontalAlignment.Center,
                             VerticalAlignment = VerticalAlignment.Center
                         };
-                        cell.Child = dot;
                     }
 
                     if (!readOnly)
@@ -176,7 +187,7 @@ namespace RadicalFeedbackApp.Views
                         cell.PointerExited += (s, e) =>
                         {
                             var b = (Border)s;
-                            bool isPresent = (creneau?.Present ?? false);
+                            bool isPresent = creneau?.Present ?? false;
                             b.Background = isPresent
                                 ? new SolidColorBrush(Color.FromArgb(255, 30, 8, 12))
                                 : new SolidColorBrush(Color.FromArgb(255, 10, 10, 11));

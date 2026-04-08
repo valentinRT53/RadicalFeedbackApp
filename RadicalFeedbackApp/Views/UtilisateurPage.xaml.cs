@@ -51,6 +51,8 @@ namespace RadicalFeedbackApp.Views
             ChampMdpPanel.Visibility = Visibility.Visible;
             ChampInfosPanel.Visibility = Visibility.Visible;
             ChampSpecialisationsPanel.Visibility = Visibility.Collapsed;
+            ChampRolePanel.Visibility = Visibility.Visible;
+            ChampRole.SelectedIndex = 0;
 
             ChampLogin.Text = "";
             ChampMdp.Password = "";
@@ -86,6 +88,7 @@ namespace RadicalFeedbackApp.Views
             LabelIdUtilisateur.Text = _utilisateurEnCours.Id.ToString();
             LabelIdAbonnement.Text = _utilisateurEnCours.IdAbonnement.ToString();
             ChampStatut.SelectedIndex = _utilisateurEnCours.Statut == "Actif" ? 0 : 1;
+            LabelLogin.Text = _utilisateurEnCours.Login;
 
             // Spécialisations uniquement pour les experts
             if (_utilisateurEnCours.Role == "Expert")
@@ -206,6 +209,13 @@ namespace RadicalFeedbackApp.Views
                     return;
                 }
 
+                int idRole = ChampRole.SelectedIndex switch
+                {
+                    1 => 3, // Expert
+                    2 => 1, // Admin
+                    _ => 2  // Utilisateur (par défaut)
+                };
+
                 var u = new Utilisateur
                 {
                     Nom = ChampNom.Text.Trim(),
@@ -216,7 +226,7 @@ namespace RadicalFeedbackApp.Views
                     IdAbonnement = 1
                 };
 
-                _vm.Ajouter(u, ChampLogin.Text.Trim(), ChampMdp.Password);
+                _vm.Ajouter(u, ChampLogin.Text.Trim(), ChampMdp.Password, idRole);
                 PanelColumn.Width = new GridLength(0);
             }
             else if (_mode == ModePanel.Modifier)
@@ -229,7 +239,6 @@ namespace RadicalFeedbackApp.Views
 
                 _vm.Modifier(_utilisateurEnCours);
 
-                // Sauvegarde les spécialisations si expert
                 if (_utilisateurEnCours.Role == "Expert")
                     _specService.SetSpecialisationsExpert(_utilisateurEnCours.Id, _specSelectionnees);
 
