@@ -71,13 +71,16 @@ LEFT JOIN CONNEXION c ON u.ID_UTILISATEUR = c.ID_UTILISATEUR";
             int newId = Convert.ToInt32(cmdUser.ExecuteScalar());
 
             // Insère la connexion
+            string hash = BCrypt.Net.BCrypt.HashPassword(mdp);
+
+            // Insère la connexion
             string queryConn = @"
-                INSERT INTO CONNEXION (ID_UTILISATEUR, LOGIN_CONNEXION, MPD_CONNEXION)
-                VALUES (@id, @login, @mdp)";
+    INSERT INTO CONNEXION (ID_UTILISATEUR, LOGIN_CONNEXION, MPD_CONNEXION)
+    VALUES (@id, @login, @mdp)";
             using var cmdConn = new SqlCommand(queryConn, conn);
             cmdConn.Parameters.AddWithValue("@id", newId);
             cmdConn.Parameters.AddWithValue("@login", login);
-            cmdConn.Parameters.AddWithValue("@mdp", mdp);
+            cmdConn.Parameters.AddWithValue("@mdp", hash);
             cmdConn.ExecuteNonQuery();
 
             // Attribue le rôle Utilisateur (ID_ROLE = 2)
@@ -120,14 +123,20 @@ LEFT JOIN CONNEXION c ON u.ID_UTILISATEUR = c.ID_UTILISATEUR";
             if (conn == null) return;
 
             foreach (var q in new[]
-            {
-                "DELETE FROM DISPONIBILITE WHERE ID_UTILISATEUR = @id",
-                "DELETE FROM SIGNALEMENT WHERE ID_UTILISATEUR = @id",
-                "DELETE FROM AVIS WHERE ID_UTILISATEUR = @id",
-                "DELETE FROM OBTENIR WHERE ID_UTILISATEUR = @id",
-                "DELETE FROM CONNEXION WHERE ID_UTILISATEUR = @id",
-                "DELETE FROM UTILISATEUR WHERE ID_UTILISATEUR = @id"
-            })
+{
+    "DELETE FROM MESSAGE WHERE ID_CONV IN (SELECT ID_CONV FROM CONVERSATION WHERE ID_UTILISATEUR = @id)",
+    "DELETE FROM CATEGORISER WHERE ID_CONV IN (SELECT ID_CONV FROM CONVERSATION WHERE ID_UTILISATEUR = @id)",
+    "DELETE FROM AVIS WHERE ID_CONV IN (SELECT ID_CONV FROM CONVERSATION WHERE ID_UTILISATEUR = @id)",
+    "DELETE FROM CONVERSATION_EXPERT WHERE ID_CONV IN (SELECT ID_CONV FROM CONVERSATION WHERE ID_UTILISATEUR = @id)", // ← ajouté
+    "DELETE FROM CONVERSATION WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM DISPONIBILITE WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM SIGNALEMENT WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM AVIS WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM EXPERT_SPECIALISATION WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM OBTENIR WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM CONNEXION WHERE ID_UTILISATEUR = @id",
+    "DELETE FROM UTILISATEUR WHERE ID_UTILISATEUR = @id"
+})
             {
                 using var cmd = new SqlCommand(q, conn);
                 cmd.Parameters.AddWithValue("@id", id);
@@ -142,7 +151,8 @@ LEFT JOIN CONNEXION c ON u.ID_UTILISATEUR = c.ID_UTILISATEUR";
 
             string query = "UPDATE CONNEXION SET MPD_CONNEXION = @mdp WHERE ID_UTILISATEUR = @id";
             using var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@mdp", nouveauMdp);
+            string hash = BCrypt.Net.BCrypt.HashPassword(nouveauMdp);
+            cmd.Parameters.AddWithValue("@mdp", hash);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
