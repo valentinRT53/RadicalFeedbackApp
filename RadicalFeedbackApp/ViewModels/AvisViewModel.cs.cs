@@ -53,6 +53,15 @@ namespace RadicalFeedbackApp.ViewModels
             }
         }
 
+        public void Supprimer(int id)
+        {
+            _service.Supprimer(id);
+            // Recharge les avis du même expert
+            int idExpert = Session.EstAdmin
+                ? Experts[_expertSelectionneIndex].id
+                : Session.IdUtilisateur;
+            ChargerAvis(idExpert);
+        }
         public void ChargerAvis(int idExpert)
         {
             AvisList.Clear();

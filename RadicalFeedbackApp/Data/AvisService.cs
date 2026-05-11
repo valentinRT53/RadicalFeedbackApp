@@ -61,6 +61,17 @@ namespace RadicalFeedbackApp.Data
             return Math.Round(Convert.ToDouble(result), 1);
         }
 
+        public void Supprimer(int id)
+        {
+            using var conn = db.GetConnection();
+            if (conn == null) return;
+
+            string query = "DELETE FROM AVIS WHERE ID_AVIS = @id";
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.ExecuteNonQuery();
+        }
+
         public List<(int id, string prenom, string nom)> GetTousLesExperts()
         {
             var liste = new List<(int, string, string)>();

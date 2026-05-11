@@ -1,4 +1,4 @@
-<Page
+ï»¿<Page
     x:Class="RadicalFeedbackApp.Views.AvisPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -27,13 +27,13 @@
                                FontSize="28"
                                CharacterSpacing="20"
                                Foreground="White"/>
-                    <TextBlock Text="Évaluations reçues"
+                    <TextBlock Text="Ã‰valuations reÃ§ues"
                                FontSize="12"
                                Foreground="#6B6B7A"
                                Margin="0,4,0,0"/>
                 </StackPanel>
 
-                <!-- Menu déroulant admin -->
+                <!-- Menu dÃ©roulant admin -->
                 <ComboBox x:Name="ExpertCombo"
                           Grid.Column="1"
                           Width="220"
@@ -142,15 +142,32 @@
 
                                     <Border Height="1" Background="#2A2A32" Margin="0,0,0,16"/>
 
-                                    <!-- Note -->
-                                    <StackPanel>
-                                        <TextBlock Text="NOTE" FontSize="9" CharacterSpacing="200" Foreground="#6B6B7A"/>
-                                        <TextBlock Text="{Binding Note}"
-                                                   FontFamily="Bebas Neue"
-                                                   FontSize="28"
-                                                   Foreground="#E8192C"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
+                                    <!-- Note + bouton supprimer -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="NOTE" FontSize="9"
+                                                       CharacterSpacing="200" Foreground="#6B6B7A"/>
+                                            <TextBlock Text="{Binding Note}"
+                                                       FontFamily="Bebas Neue"
+                                                       FontSize="28"
+                                                       Foreground="#E8192C"
+                                                       Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Content="âœ•"
+                                                Tag="{Binding}"
+                                                Background="#1E0508"
+                                                Foreground="#E8192C"
+                                                FontSize="12"
+                                                Padding="12,6"
+                                                CornerRadius="2"
+                                                VerticalAlignment="Bottom"
+                                                Click="BtnSupprimer_Click"/>
+                                    </Grid>
 
                                 </StackPanel>
                             </Grid>

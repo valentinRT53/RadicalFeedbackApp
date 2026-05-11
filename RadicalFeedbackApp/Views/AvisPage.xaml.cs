@@ -1,6 +1,9 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RadicalFeedbackApp.Helpers;
+using RadicalFeedbackApp.Models;
 using RadicalFeedbackApp.ViewModels;
+using System;
 
 namespace RadicalFeedbackApp.Views
 {
@@ -27,6 +30,22 @@ namespace RadicalFeedbackApp.Views
         private void ExpertCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _vm.ExpertSelectionneIndex = ExpertCombo.SelectedIndex;
+        }
+
+        private async void BtnSupprimer_Click(object sender, RoutedEventArgs e)
+        {
+            var avis = (Avis)((Button)sender).Tag;
+            var dialog = new ContentDialog
+            {
+                Title = "Supprimer l'avis",
+                Content = $"Supprimer l'avis \"{avis.Titre}\" ? Cette action est irréversible.",
+                PrimaryButtonText = "Supprimer",
+                CloseButtonText = "Annuler",
+                XamlRoot = this.XamlRoot
+            };
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+                _vm.Supprimer(avis.Id);
         }
     }
 }
